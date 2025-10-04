@@ -4,12 +4,18 @@ const app  = express()
 const dotenv = require("dotenv")
 const {userRouter} = require("./routes/users")
 const cookieParser = require('cookie-parser')
+const cors = require('cors');
 
+const corsOptions = {
+    origin: process.env.CLIENT_URL,
+    credentials: true,            //access-control-allow-credentials:true
+}
 
 // load environment variables and middlewares
 dotenv.config()
 app.use(express.json()) 
 app.use(cookieParser())
+app.use(cors(corsOptions))
 
 
 // routes
