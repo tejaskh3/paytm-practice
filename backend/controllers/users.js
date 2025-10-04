@@ -103,11 +103,24 @@ const logout = async (req, res) => {
         res.status(500).json({ error: "Error while logging out, please try again later"})
     }
 }
+
+// todo: add pagination
+const getAllUsers = async () => {
+    try {
+        const users = await User.find()
+        res.status(200).json({users})
+    } catch (error) {
+        console.log("Error while getting all users", error)
+        res.status(500).json({ error: "Error while getting all users, please try again later"})
+    }
+}
+
 module.exports = {
     singUp,
     login,
     updateUser,
-    logout
+    logout,
+    getAllUsers
 }
 
 
