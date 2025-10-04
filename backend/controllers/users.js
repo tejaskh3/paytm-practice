@@ -1,4 +1,5 @@
-const {Users} = require("../models/Users")
+const {User } = require("../models/Users")
+const {Account }    = require("../models/Accounts")
 const bcrypt = require("bcrypt") // study : tradeoffs between bcrypt and bcryptjs
 
 
@@ -14,17 +15,27 @@ const singUp = async (req, res) => {
        if(!password){
         res.status(400).json({ error:   "Password is required"})
        }
+       const existingUser = await User.findOne({email})
+       if(existingUser){
+        res.status(400).json({error: "Email already exists"})
+       }
 
        // encrypt password
        const salt = await bcrypt.genSalt(10)
        const hashedPassword = await bcrypt.hash(password, salt) // study: this in deep why we need to use await high level i know
        
-        const user = new Users({ // study: the methods at least at high level and write a blog on that
+        const user = new User({ // study: the methods at least at high level and write a blog on that
             firstName,
             lastName,
             email,
             password: hashedPassword
         })
+        const randomAmmount =  1 + Math.random() * 10000
+        const account = new Account({
+            balance: randomAmmount,
+            user: user._id
+        })
+        await account.save()
         await user.save()
         res.cookie("access_token ", JSON.stringify({user: user._id, email: user.email}), {httpOnly: true, secure: true, sameSite: "lax", maxAge: 60 * 60 * 24 * 7}) // max age is: 7 days
         res.status(201).json({user, message: "User created successfully"})
@@ -40,13 +51,13 @@ const login = async (req, res) => {
         if(!email || !password){
             res.status(400).json({ error: "Email or password is required" })
         }
-        const user = await Users.findOne({email})
+        const user = await User.findOne({email})
         const isCorrectPassword = await bcrypt.compare(password, user.password)
         if(!isCorrectPassword || !user){
             res.status(400).json({ error: "Invalid email or password" }) // to make sure that the user is not a hacker trying to hit and trial to get the password
         }
 
-        // todo: set cookie
+        res.cookie("access_token ", JSON.stringify({user: user._id, email: user.email}), {httpOnly: true, secure: true, sameSite: "lax", maxAge: 60 * 60 * 24 * 7}) // 7 day
         res.status(200).json({user, message: "User logged in successfully"})
 
     } catch (error) {
@@ -74,7 +85,7 @@ const updateUser = async (req,  res)  => {
         ...(password && { password: hashedPassword })
         };
 
-        const user = await Users.findOneAndUpdate({_id}, updatedFields, {new: true})
+        const user = await User.findOneAndUpdate({_id}, updatedFields, {new: true})
         res.cookie("access_token ", JSON.stringify({user: user._id, email: user.email}), {httpOnly: true, secure: true, sameSite: "lax", maxAge: 60 * 60 * 24 * 7})
         res.status(200).json({user, message: "User updated successfully"})
     } catch (error) {

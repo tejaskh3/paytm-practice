@@ -2,10 +2,12 @@ const  { connectDB }  = require("./lib/db")
 const express = require("express")
 const app  = express()
 const dotenv = require("dotenv")
-const {userRouter} = require("./routes/users")
+const {usersRouter} = require("./routes/users")
+const {accountsRouter} = require("./routes/accounts")
 const cookieParser = require('cookie-parser')
 const cors = require('cors');
 
+console.log("this is user router", usersRouter)
 const corsOptions = {
     origin: process.env.CLIENT_URL,
     credentials: true,            //access-control-allow-credentials:true
@@ -23,7 +25,8 @@ const baseUrl = 'api/v1'
 app.get("/health", (req, res) => {
     res.send("App working fine")
 })
-app.use(`${baseUrl}`, userRouter)
+app.use(`${baseUrl}`, usersRouter)
+app.use(`${baseUrl}`, accountsRouter)
 
 
 

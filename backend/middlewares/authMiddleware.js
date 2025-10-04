@@ -1,4 +1,4 @@
-const { Users } = require("../models/Users");
+const {  User } = require("../models/Users");
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -11,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
 
     const { user: userId } = JSON.parse(accessToken);
 
-    const user = await Users.findById(userId).select("-password"); // exclude password from response
+    const user = await User.findById(userId).select("-password"); // exclude password from response
 
     if (!user) {
       return res.status(401).json({ error: "Not authorized" });
