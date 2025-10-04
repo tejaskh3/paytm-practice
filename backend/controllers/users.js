@@ -57,8 +57,7 @@ const login = async (req, res) => {
 
 const updateUser = async (req,  res)  => {
     try {
-        // todo: get user id from cookie
-        const _id = "tempI_id"
+        const {_id} = req.user
         const {firstName, lastName, email, password} = req.body // study: can i use body directly else how will i identity if lastName is not provided and i still end up updating it although for now checking it in the data below
         if(!firstName || !lastName ||!email ||  !password){
             res.status(400).json({ error: "Atleast one field is required to update" })
